@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Test Metrics</title>
+</head>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="//cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+
+<body class="bg-slate-200">
+
+<div class="bg-slate-200">
+<div class="my-16">
+  <div>
+
+    <div class="flex flex-row justify-center mx-8">
+      <img src="CONICET_logo.png" alt="CONICET logo" width="250" class="mx-2">
+      <img src="IUCBC_logo.svg" alt="CONICET logo" width="300" class="mx-2">
+    </div>
+
+    <div class="flex flex-row mx-8 my-8 justify-center text-slate-700">
+      <p> <b> Unidad de Investigación en Salud - CIMETSA - IUCBC - CONICET </b> </p>
+    </div>
+
+    <div class="flex mx-8 lg:justify-end">
+      <button id="languageButton" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Ver en castellano 🇪🇸</button>
+    </div>
+
+    <div class="bg-slate-300 mx-8 my-8 rounded-lg">
+      <div class="mx-6">
+        <br>
+        <p><b id="instructions">Instructions</b></p>
+        <p id="instructionsInput">Type your data in the cells on the grid below.</p>
+        <p id="instructionsExplain">When all four input values are introduced, parameter values are shown on the table to the right.</p>
+        <br>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  <div class="flex w-full flex-col lg:flex-row">
+
+    <div>
+      <div class="mx-4 my-4 grid grid-cols-2 grid-rows-2 gap-4">
+        <input id="true_positives" class="h-16 w-32 rounded-lg bg-slate-100 text-center" placeholder="True positives" />
+        <input id="false_positives" class="h-16 w-32 rounded-lg bg-slate-100 text-center" placeholder="False positives" />
+        <input id="false_negatives" class="h-16 w-32 rounded-lg bg-slate-100 text-center" placeholder="False negatives" />
+        <input id="true_negatives" class="h-16 w-32 rounded-lg bg-slate-100 text-center" placeholder="True negatives" />
+      </div>
+    </div>
+
+    <div class="mx-4 my-4 flex flex-col gap-2">
+      
+      <div class="flex flex-row gap-2">
+        <div class="h-16 lg:h-8 w-64 lg:w-80  rounded-lg bg-slate-300 text-center"> <b id="parametersColumnLabel"> Parameter </b> </div>
+        <div class="h-16 lg:h-8 w-24 rounded-lg bg-lime-400 text-center"> <b id="valuesColumnLabel"> Value (%) </b> </div>
+        <div class="h-16 lg:h-8 w-[200px] rounded-lg bg-orange-400 text-center"> <b id="confidenceIntervalsLabel"> Confidence Interval </b> </div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="sensitivityLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Sensitivity</div>
+        <div id="sensitivity" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="sensitivityLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="sensitivityHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="specificityLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Specificity</div>
+        <div id="specificity" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="specificityLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="specificityHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="positivePredictiveValueLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive Predictive Value</div>
+        <div id="positivePredictiveValue" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="positivePredictiveValueLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="positivePredictiveValueHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="negativePredictiveValueLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative Predictive Value</div>
+        <div id="negativePredictiveValue" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="negativePredictiveValueLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="negativePredictiveValueHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="prevalenceLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Prevalence</div>
+        <div id="prevalence" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="prevalenceLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="prevalenceHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="diagnosticAccuracyLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Diagnostic Accuracy</div>
+        <div id="diagnosticAccuracy" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="diagnosticAccuracyLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="diagnosticAccuracyHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="positiveTestLikelihoodRatioLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive Test LR</div>
+        <div id="positiveTestLikelihoodRatio" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="positiveTestLikelihoodRatioLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="positiveTestLikelihoodRatioHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="negativeTestLikelihoodRatioLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative Test LR</div>
+        <div id="negativeTestLikelihoodRatio" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="negativeTestLikelihoodRatioLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="negativeTestLikelihoodRatioHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="positiveEntropyReductionLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive Test Entropy Reduction</div>
+        <div id="positiveEntropyReduction" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="positiveEntropyReductionLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+        <div id="positiveEntropyReductionHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="negativeEntropyReductionLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative Test Entropy Reduction</div>
+        <div id="negativeEntropyReduction" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="negativeEntropyReductionLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+        <div id="negativeEntropyReductionHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+      </div>
+      
+      <div class="flex flex-row gap-2">
+        <div id="positiveFScoreLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive F-Score</div>
+        <div id="positiveFScore" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="positiveFScoreLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="positiveFScoreHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="negativeFScoreLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative F-Score</div>
+        <div id="negativeFScore" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="negativeFScoreLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="negativeFScoreHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+
+      <div class="flex flex-row gap-2">
+        <div id="kappaLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Cohen's Kappa</div>
+        <div id="kappa" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="kappaLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="kappaHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+      </div>
+ 
+      </div>
+    </div>
+  </div>
+</div>
+    
+</body>
+
+<script>
+
+// Metrics
+
+const allParameters = ["sensitivity", "specificity", "positivePredictiveValue", "negativePredictiveValue", "prevalence", "diagnosticAccuracy", "positiveTestLikelihoodRatio", "negativeTestLikelihoodRatio", "positiveEntropyReduction", "negativeEntropyReduction", "positiveFScore", "negativeFScore", "kappa"];
+
+const stderr = (f, truePositives, falseNegatives, falsePositives, trueNegatives) => 1.96 * Math.sqrt(f(truePositives, falseNegatives, falsePositives, trueNegatives) * (1 - f(truePositives, falseNegatives, falsePositives, trueNegatives)) / (truePositives + falsePositives + trueNegatives + falseNegatives));
+
+const sensitivity = (truePositives, falseNegatives, falsePositives, trueNegatives) => truePositives / (truePositives + falseNegatives);
+const specificity = (truePositives, falseNegatives, falsePositives, trueNegatives) => trueNegatives / (trueNegatives + falsePositives);
+const positivePredictiveValue = (truePositives, falseNegatives, falsePositives, trueNegatives) => truePositives / (truePositives + falsePositives);
+const negativePredictiveValue = (truePositives, falseNegatives, falsePositives, trueNegatives) => trueNegatives / (trueNegatives + falseNegatives);
+const prevalence = (truePositives, falseNegatives, falsePositives, trueNegatives) => (truePositives + falseNegatives) / (trueNegatives + truePositives + falseNegatives + falsePositives);
+const diagnosticAccuracy = (truePositives, falseNegatives, falsePositives, trueNegatives) => (truePositives + trueNegatives) / (trueNegatives + truePositives + falseNegatives + falsePositives);
+
+function PositiveTestLikelihoodRatio (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  return sensitivity(truePositives, falseNegatives, falsePositives, trueNegatives) / (1 - specificity(truePositives, falseNegatives, falsePositives, trueNegatives));
+}
+
+function NegativeTestLikelihoodRatio (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  const falseNegativesRate = falseNegatives / (truePositives + falseNegatives);
+  const trueNegativesRate = trueNegatives / (trueNegatives + falsePositives);
+  return falseNegativesRate / trueNegativesRate;
+}
+
+
+function H0 (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  const prev = prevalence(truePositives, falseNegatives, falsePositives, trueNegatives);
+  const comp = 1 - prev;
+  return (prev * Math.log(prev))- (comp * Math.log(comp));
+}
+
+function HPlus (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  const ppv = positivePredictiveValue(truePositives, falseNegatives, falsePositives, trueNegatives);
+  const comp = 1 - ppv;
+  return (ppv * Math.log(ppv)) - (comp * Math.log(comp));
+}
+
+function HMinus (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  const npv = negativePredictiveValue(truePositives, falseNegatives, falsePositives, trueNegatives);
+  const comp = 1 - npv;
+  return (npv * Math.log(npv)) - (comp * Math.log(comp));
+}
+
+function calculateEntropyMetrics(truePositive, falsePositive, falseNegative, trueNegative) 
+{
+    // Total de casos
+    const total = truePositive + falsePositive + falseNegative + trueNegative;
+    
+    if (total === 0) {
+        throw new Error("El total de casos no puede ser cero");
+    }
+    
+    // Prevalencia
+    const prevalence = (truePositive + falseNegative) / total;
+    
+    // Valor predictivo positivo (PPV)
+    let positivePredictiveValue = 0;
+    if ((truePositive + falsePositive) !== 0) {
+        positivePredictiveValue = truePositive / (truePositive + falsePositive);
+    }
+    
+    // Valor predictivo negativo (NPV)
+    let negativePredictiveValue = 0;
+    if ((falseNegative + trueNegative) !== 0) {
+        negativePredictiveValue = trueNegative / (falseNegative + trueNegative);
+    }
+    
+    /**
+     * Función auxiliar para calcular entropía evitando log(0)
+     * @param {number} p - Probabilidad
+     * @returns {number} Valor de entropía
+     */
+    function safeEntropyCalc(p) {
+        if (p <= 0 || p >= 1) {
+            return 0;
+        }
+        return -p * Math.log(p) - (1 - p) * Math.log(1 - p);
+    }
+    
+    // Entropía de la prevalencia
+    const entropy = safeEntropyCalc(prevalence);
+    
+    // Entropía positiva
+    const positiveEntropy = safeEntropyCalc(positivePredictiveValue);
+    
+    // Entropía negativa
+    const negativeEntropy = safeEntropyCalc(negativePredictiveValue);
+    
+    // Reducción de entropía
+    const positiveEntropyReduction = positiveEntropy - entropy;
+    const negativeEntropyReduction = negativeEntropy - entropy;
+    
+    return {
+        truePositive: truePositive,
+        falsePositive: falsePositive,
+        falseNegative: falseNegative,
+        trueNegative: trueNegative,
+        total: total,
+        prevalence: prevalence,
+        positivePredictiveValue: positivePredictiveValue,
+        negativePredictiveValue: negativePredictiveValue,
+        entropy: entropy,
+        positiveEntropy: positiveEntropy,
+        negativeEntropy: negativeEntropy,
+        positiveEntropyReduction: positiveEntropyReduction,
+        negativeEntropyReduction: negativeEntropyReduction
+    };
+}
+
+function positiveEntropyReduction (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  return calculateEntropyMetrics(truePositives, falsePositives, falseNegatives, trueNegatives).positiveEntropyReduction * 100;
+}
+
+function negativeEntropyReduction (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  return calculateEntropyMetrics(truePositives, falsePositives, falseNegatives, trueNegatives).negativeEntropyReduction * 100;
+};
+
+function positiveFScore (truePositives, falseNegatives, falsePositives, trueNegatives) {
+  const ppv = positivePredictiveValue(truePositives, falseNegatives, falsePositives, trueNegatives);
+  const s = sensitivity(truePositives, falseNegatives, falsePositives, trueNegatives);
+  return 2 * (ppv * s / (ppv + s)) 
+}
+
+function negativeFScore (truePositives, falseNegatives, falsePositives, trueNegatives) {
+  const npv = negativePredictiveValue(truePositives, falseNegatives, falsePositives, trueNegatives);
+  const s = specificity(truePositives, falseNegatives, falsePositives, trueNegatives);
+  return 2 * (npv * s / (npv + s));
+}
+
+function kappa (truePositives, falseNegatives, falsePositives, trueNegatives)
+{
+  const assumedPositive = falsePositives + truePositives;
+  const actualPositives = truePositives + falseNegatives;
+  const actualNegatives = falsePositives + trueNegatives;
+  const assumedNegative = falseNegatives + trueNegatives; 
+  return ((2 * (truePositives * trueNegatives - falseNegatives * falsePositives)) / (assumedPositive * actualNegatives + assumedNegative * actualPositives)) / 100
+}
+
+const noConfidenceIntervals = new Set(["positiveEntropyReduction", "negativeEntropyReduction"]);
+const otherStandardError = new Set(["negativeTestLikelihoodRatio", "positiveTestLikelihoodRatio"]);
+
+const formulasByParameter = new Map();
+
+formulasByParameter.set("sensitivity", sensitivity);
+formulasByParameter.set("specificity", specificity);
+formulasByParameter.set("positivePredictiveValue", positivePredictiveValue);
+formulasByParameter.set("negativePredictiveValue", negativePredictiveValue);
+formulasByParameter.set("prevalence", prevalence);
+formulasByParameter.set("diagnosticAccuracy", diagnosticAccuracy);
+formulasByParameter.set("positiveTestLikelihoodRatio", PositiveTestLikelihoodRatio);
+formulasByParameter.set("negativeTestLikelihoodRatio", NegativeTestLikelihoodRatio);
+formulasByParameter.set("positiveEntropyReduction", positiveEntropyReduction);
+formulasByParameter.set("negativeEntropyReduction", negativeEntropyReduction);
+formulasByParameter.set("positiveFScore", positiveFScore);
+formulasByParameter.set("negativeFScore", negativeFScore);
+formulasByParameter.set("kappa", kappa);
+
+function checkInput (inputContent)
+{
+    const parsedInt = parseInt(inputContent, 10);
+    return Number.isInteger(parsedInt);
+}
+
+function updateValues ()
+{
+    const truePositivesCount = document.getElementById("true_positives").value;
+    const falsePositivesCount = document.getElementById("false_positives").value;
+    const falseNegativesCount = document.getElementById("false_negatives").value;
+    const trueNegativesCount = document.getElementById("true_negatives").value;
+
+    const allOk = checkInput(truePositivesCount) && checkInput(falsePositivesCount) && checkInput(falseNegativesCount) && checkInput(trueNegativesCount);
+
+    if (allOk)
+    {
+        const truePositives = Number(truePositivesCount);
+        const trueNegatives = Number(trueNegativesCount);
+        const falsePositives = Number(falsePositivesCount);
+        const falseNegatives = Number(falseNegativesCount);
+        for (let i = 0; i < allParameters.length; i++)
+        {
+            const valueFormula = formulasByParameter.get(allParameters[i]);
+            document.getElementById(allParameters[i]).textContent = (valueFormula(truePositives, falseNegatives, falsePositives, trueNegatives)).toFixed(2);
+
+            if (!noConfidenceIntervals.has(allParameters[i]))
+            {
+              if (otherStandardError.has(allParameters[i]))
+              {
+                const standardError = 1.96 * Math.sqrt(1 / truePositives - 1 / (truePositives + falseNegatives) + 1 / falsePositives - 1 / (falsePositives + trueNegatives));
+                const estimation = valueFormula(truePositives, falseNegatives, falsePositives, trueNegatives);
+                const lower = Math.E ** (Math.log(estimation) - standardError);
+                const higher = Math.E ** (Math.log(estimation) + standardError);
+                document.getElementById(allParameters[i]).textContent = (valueFormula(truePositives, falseNegatives, falsePositives, trueNegatives)).toFixed(2);
+                document.getElementById(allParameters[i] + "Lower").textContent = (lower).toFixed(2);
+                document.getElementById(allParameters[i] + "Higher").textContent = (higher).toFixed(2);
+              }
+              if (!otherStandardError.has(allParameters[i]))
+              {
+                const standardError = stderr(valueFormula, truePositives, falseNegatives, falsePositives, trueNegatives);
+                const estimation = valueFormula(truePositives, falseNegatives, falsePositives, trueNegatives);
+                const lower = estimation - standardError;
+                const higher = estimation + standardError;
+                document.getElementById(allParameters[i]).textContent = (valueFormula(truePositives, falseNegatives, falsePositives, trueNegatives)*100).toFixed(2);
+                document.getElementById(allParameters[i] + "Lower").textContent = (lower*100).toFixed(2);
+                document.getElementById(allParameters[i] + "Higher").textContent = (higher*100).toFixed(2);
+              }
+            }
+        }
+    }
+    else
+    {
+        const languageButton = document.getElementById(languageButtonId);
+        const englishMode = languageButton.textContent == spanish;
+        const spanishMode = languageButton.textContent == english;
+
+        for (let i = 0; i < allParameters.length; i++)
+        {
+            document.getElementById(allParameters[i]).textContent = "%";
+
+            if (!noConfidenceIntervals.has(allParameters[i]) && spanishMode)
+            {
+              document.getElementById(allParameters[i] + "Lower").textContent = "Inferior";
+              document.getElementById(allParameters[i] + "Higher").textContent = "Superior";
+            }
+
+            if (!noConfidenceIntervals.has(allParameters[i]) && englishMode)
+            {
+              document.getElementById(allParameters[i] + "Lower").textContent = "Lower";
+              document.getElementById(allParameters[i] + "Higher").textContent = "Higher";
+            }
+        }
+    }
+}
+
+// Localization
+
+const spanish = "Ver en castellano 🇪🇸"
+const english = "Switch to English 🇬🇧"
+
+const languageButtonId = "languageButton";
+
+const allColumnLabels = ["parametersColumnLabel", "valuesColumnLabel", "confidenceIntervalsLabel"];
+const allParameterLabels = allParameters.map((name) => name + "Label");
+
+const allTextElements = ["instructions", "instructionsInput", "instructionsExplain", ...allColumnLabels, ...allParameterLabels];
+
+// The text content of each text element, in Spanish
+const spanishPairs = [
+  ["instructions", "Instrucciones"],
+  ["instructionsInput", "Introduzca la cantidad de verdaderos positivos, verdaderos negativos, falsos negativos y falsos positivos en las celdas de abajo."], 
+  ["instructionsExplain", "Cuando los cuatro valores estén definidos podrá ver los valores de las métricas en la tabla que ve a la derecha."],
+  ["parametersColumnLabel", "Métrica"],
+  ["valuesColumnLabel", "Valor (%)"],
+  ["confidenceIntervalsLabel", "Intervalo de confianza"],
+  ["sensitivityLabel", "Sensibilidad"],
+  ["specificityLabel", "Especificidad"],
+  ["positivePredictiveValueLabel", "Valor Predictivo Positivo"],
+  ["negativePredictiveValueLabel", "Valor Predictivo Negativo"],
+  ["prevalenceLabel", "Prevalencia"],
+  ["positiveTestLikelihoodRatioLabel", "Razón de Verosimilitud Prueba+"],
+  ["negativeTestLikelihoodRatioLabel", "Razón de Verosimilitud Prueba-"],
+  ["positiveEntropyReductionLabel", "Reducción de la Entropía Negativa"],
+  ["negativeEntropyReductionLabel", "Reducción de la Entropía Positiva"],
+  ["positiveFScoreLabel", "Puntaje F Positivo"],
+  ["negativeFScoreLabel", "Puntaje F Negativo"],
+  ["kappaLabel", "Kappa de Cohen"],
+  ["diagnosticAccuracyLabel", "Precisión Diagnóstica"]
+];
+
+const englishPairs = [
+  ["instructions", "Instructions"],
+  ["instructionsInput", "Type your data in the cells on the grid below."], 
+  ["instructionsExplain", "When all four input values are introduced, parameter values are shown on the table to the right."],
+  ["parametersColumnLabel", "Metric"],
+  ["valuesColumnLabel", "Value (%)"],
+  ["confidenceIntervalsLabel", "Confidence interval"],
+  ["sensitivityLabel", "Sensitivity"],
+  ["specificityLabel", "Specificity"],
+  ["positivePredictiveValueLabel", "Positive Predictive Value"],
+  ["negativePredictiveValueLabel", "Negative Predictive Value"],
+  ["prevalenceLabel", "Prevalence"],
+  ["positiveTestLikelihoodRatioLabel", "Positive Test Likelihood Ratio"],
+  ["negativeTestLikelihoodRatioLabel", "Negative Test Likelihood Ratio"],
+  ["positiveEntropyReductionLabel", "Positive Entropy Reduction"],
+  ["negativeEntropyReductionLabel", "Negative Entropy Reduction"],
+  ["positiveFScoreLabel", "Positive F-Score"],
+  ["negativeFScoreLabel", "Negative F-Score"],
+  ["kappaLabel", "Cohen's kappa"],
+  ["diagnosticAccuracyLabel", "Diagnostic Accuracy"]
+];
+
+// The text content of each text element, in English
+
+// The same data as the two arrays above, but as a map
+
+const toSpanish = new Map(spanishPairs);
+const toEnglish = new Map(englishPairs);
+
+// Code run when pressing the 'switch language' button
+
+function switchLanguages ()
+{
+  // Figure out which language we are in
+  const languageButton = document.getElementById(languageButtonId);
+  const englishMode = languageButton.textContent == spanish;
+  const spanishMode = languageButton.textContent == english;
+  if (englishMode)
+  {
+    // Update the content of all text elements
+    for (let i = 0; i < allTextElements.length; i++)
+    {
+      const textElementId = allTextElements[i];
+      document.getElementById(textElementId).textContent = toSpanish.get(textElementId);
+    }
+    // Set the language button content so that language mode flags work and users see the right target language name in the button text
+    languageButton.textContent = english;
+  }
+  if (spanishMode)
+  {
+    // Update the content of all text elements
+    for (let i = 0; i < allTextElements.length; i++)
+    {
+      const textElementId = allTextElements[i];
+      document.getElementById(textElementId).textContent = toEnglish.get(textElementId);
+    }
+    // Set the language button content so that language mode flags work and users see the right target language name in the button text
+    languageButton.textContent = spanish;
+  }
+
+  updateValues();
+}
+
+document.getElementById("true_positives").addEventListener('input', updateValues);
+document.getElementById("false_positives").addEventListener('input', updateValues);
+document.getElementById("true_negatives").addEventListener('input', updateValues);
+document.getElementById("false_negatives").addEventListener('input', updateValues);
+
+document.getElementById(languageButtonId).addEventListener("click", switchLanguages);
+
+</script>
+
+</html>
