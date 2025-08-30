@@ -15,9 +15,9 @@
 <div class="my-16">
   <div>
 
-    <div class="flex flex-row justify-center mx-8">
-      <img src="CONICET_logo.png" alt="CONICET logo" width="250" class="mx-2">
-      <img src="IUCBC_logo.svg" alt="CONICET logo" width="300" class="mx-2">
+    <div class="flex flex-col md:flex-row justify-center mx-8">
+      <img src="CONICET_logo.png" alt="CONICET logo" width="250" class="mx-2 my-2">
+      <img src="IUCBC_logo.svg" alt="CONICET logo" width="300" class="mx-2 my-2">
     </div>
 
     <div class="flex flex-row mx-8 my-8 justify-center text-slate-700">
@@ -116,31 +116,17 @@
       </div>
 
       <div class="flex flex-row gap-2">
-        <div id="positiveEntropyReductionLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive Test Entropy Reduction</div>
-        <div id="positiveEntropyReduction" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
-        <div id="positiveEntropyReductionLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
-        <div id="positiveEntropyReductionHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
-      </div>
-
-      <div class="flex flex-row gap-2">
-        <div id="negativeEntropyReductionLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative Test Entropy Reduction</div>
-        <div id="negativeEntropyReduction" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
-        <div id="negativeEntropyReductionLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
-        <div id="negativeEntropyReductionHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+        <div id="entropyReductionLabel" class="h-16 lg:h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Entropy Reduction</div>
+        <div id="entropyReduction" class="h-16 lg:h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="entropyReductionLower" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
+        <div id="entropyReductionHigher" class="h-16 lg:h-8 w-24 rounded-lg bg-orange-300 text-center"></div>
       </div>
       
       <div class="flex flex-row gap-2">
-        <div id="positiveFScoreLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Positive F-Score</div>
-        <div id="positiveFScore" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
-        <div id="positiveFScoreLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
-        <div id="positiveFScoreHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
-      </div>
-
-      <div class="flex flex-row gap-2">
-        <div id="negativeFScoreLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">Negative F-Score</div>
-        <div id="negativeFScore" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
-        <div id="negativeFScoreLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
-        <div id="negativeFScoreHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
+        <div id="FScoreLabel" class="h-8 w-64 lg:w-80 rounded-lg bg-slate-100 text-center">F-Score</div>
+        <div id="FScore" class="h-8 w-24 rounded-lg bg-lime-300 text-center">%</div>
+        <div id="FScoreLower" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Lower</div>
+        <div id="FScoreHigher" class="h-8 w-24 rounded-lg bg-orange-300 text-center">Higher</div>
       </div>
 
       <div class="flex flex-row gap-2">
@@ -161,7 +147,7 @@
 
 // Metrics
 
-const allParameters = ["sensitivity", "specificity", "positivePredictiveValue", "negativePredictiveValue", "prevalence", "diagnosticAccuracy", "positiveTestLikelihoodRatio", "negativeTestLikelihoodRatio", "positiveEntropyReduction", "negativeEntropyReduction", "positiveFScore", "negativeFScore", "kappa"];
+const allParameters = ["sensitivity", "specificity", "positivePredictiveValue", "negativePredictiveValue", "prevalence", "diagnosticAccuracy", "positiveTestLikelihoodRatio", "negativeTestLikelihoodRatio", "entropyReduction", "FScore", "kappa"];
 
 const stderr = (f, truePositives, falseNegatives, falsePositives, trueNegatives) => 1.96 * Math.sqrt(f(truePositives, falseNegatives, falsePositives, trueNegatives) * (1 - f(truePositives, falseNegatives, falsePositives, trueNegatives)) / (truePositives + falsePositives + trueNegatives + falseNegatives));
 
@@ -206,81 +192,88 @@ function HMinus (truePositives, falseNegatives, falsePositives, trueNegatives)
   return (npv * Math.log(npv)) - (comp * Math.log(comp));
 }
 
-function calculateEntropyMetrics(truePositive, falsePositive, falseNegative, trueNegative) 
+function calcularReduccionEntropiaDiagnostica(TP, FP, FN, TN)
 {
-    // Total de casos
-    const total = truePositive + falsePositive + falseNegative + trueNegative;
+    // Calcular totales
+    const N = TP + FP + FN + TN;  // Total de casos
+    const n_positivo = TP + FP;   // Total de casos con resultado positivo del test
+    const n_negativo = FN + TN;   // Total de casos con resultado negativo del test
     
-    if (total === 0) {
-        throw new Error("El total de casos no puede ser cero");
-    }
-    
-    // Prevalencia
-    const prevalence = (truePositive + falseNegative) / total;
-    
-    // Valor predictivo positivo (PPV)
-    let positivePredictiveValue = 0;
-    if ((truePositive + falsePositive) !== 0) {
-        positivePredictiveValue = truePositive / (truePositive + falsePositive);
-    }
-    
-    // Valor predictivo negativo (NPV)
-    let negativePredictiveValue = 0;
-    if ((falseNegative + trueNegative) !== 0) {
-        negativePredictiveValue = trueNegative / (falseNegative + trueNegative);
-    }
-    
-    /**
-     * Función auxiliar para calcular entropía evitando log(0)
-     * @param {number} p - Probabilidad
-     * @returns {number} Valor de entropía
-     */
-    function safeEntropyCalc(p) {
-        if (p <= 0 || p >= 1) {
+    function calcularTerminoEntropia(numerador, denominador) {
+        if (numerador === 0 || denominador === 0) {
             return 0;
         }
-        return -p * Math.log(p) - (1 - p) * Math.log(1 - p);
+        const proporcion = numerador / denominador;
+        return proporcion * (Math.log2(denominador) - Math.log2(numerador));
     }
     
-    // Entropía de la prevalencia
-    const entropy = safeEntropyCalc(prevalence);
+    // 1. ENTROPÍA DEL NODO PADRE
     
-    // Entropía positiva
-    const positiveEntropy = safeEntropyCalc(positivePredictiveValue);
+    // Casos con enfermedad vs casos sin enfermedad
+    const casos_con_enfermedad = TP + FN;
+    const casos_sin_enfermedad = FP + TN;
     
-    // Entropía negativa
-    const negativeEntropy = safeEntropyCalc(negativePredictiveValue);
+    const termino1_padre = calcularTerminoEntropia(casos_sin_enfermedad, N);
+    const termino2_padre = calcularTerminoEntropia(casos_con_enfermedad, N);
     
-    // Reducción de entropía
-    const positiveEntropyReduction = positiveEntropy - entropy;
-    const negativeEntropyReduction = negativeEntropy - entropy;
+    const H_padre = termino1_padre + termino2_padre;
+
+    // 2. ENTROPÍA DEL NODO HIJO POSITIVO
+    
+    let H_hijo_positivo;
+    if (n_positivo > 0) {
+        const termino1_pos = calcularTerminoEntropia(TP, n_positivo);
+        const termino2_pos = calcularTerminoEntropia(FP, n_positivo);
+        H_hijo_positivo = termino1_pos + termino2_pos;
+    } else {
+        H_hijo_positivo = 0;
+    }
+    
+    // 3. ENTROPÍA DEL NODO HIJO NEGATIVO
+    
+    let H_hijo_negativo;
+    if (n_negativo > 0) {
+        const termino1_neg = calcularTerminoEntropia(FN, n_negativo);
+        const termino2_neg = calcularTerminoEntropia(TN, n_negativo);
+        H_hijo_negativo = termino1_neg + termino2_neg;
+    } else {
+        H_hijo_negativo = 0;
+    }
+    // 4. REDUCCIÓN DE ENTROPÍA
+    
+    const entropia_ponderada_hijos = (n_positivo/N * H_hijo_positivo) + (n_negativo/N * H_hijo_negativo);
+    const reduccion_entropia = H_padre - entropia_ponderada_hijos;
+    const reduccion_porcentaje = H_padre > 0 ? (reduccion_entropia / H_padre * 100) : 0;
+    
+    // Interpretación
+    let interpretacion;
+    if (reduccion_porcentaje > 50) {
+        interpretacion = "Excelente: La prueba reduce significativamente la incertidumbre diagnóstica";
+    } else if (reduccion_porcentaje > 30) {
+        interpretacion = "Buena: La prueba proporciona información diagnóstica valiosa";
+    } else if (reduccion_porcentaje > 10) {
+        interpretacion = "Moderada: La prueba aporta alguna información diagnóstica";
+    } else {
+        interpretacion = "Limitada: La prueba aporta poca información diagnóstica";
+    }
     
     return {
-        truePositive: truePositive,
-        falsePositive: falsePositive,
-        falseNegative: falseNegative,
-        trueNegative: trueNegative,
-        total: total,
-        prevalence: prevalence,
-        positivePredictiveValue: positivePredictiveValue,
-        negativePredictiveValue: negativePredictiveValue,
-        entropy: entropy,
-        positiveEntropy: positiveEntropy,
-        negativeEntropy: negativeEntropy,
-        positiveEntropyReduction: positiveEntropyReduction,
-        negativeEntropyReduction: negativeEntropyReduction
+        H_padre: H_padre,
+        H_hijo_positivo: H_hijo_positivo,
+        H_hijo_negativo: H_hijo_negativo,
+        reduccion_entropia: reduccion_entropia,
+        reduccion_porcentaje: reduccion_porcentaje,
+        N: N,
+        n_positivo: n_positivo,
+        n_negativo: n_negativo,
+        interpretacion: interpretacion
     };
 }
 
-function positiveEntropyReduction (truePositives, falseNegatives, falsePositives, trueNegatives)
+function entropyReduction (truePositives, falseNegatives, falsePositives, trueNegatives)
 {
-  return calculateEntropyMetrics(truePositives, falsePositives, falseNegatives, trueNegatives).positiveEntropyReduction * 100;
+  return calcularReduccionEntropiaDiagnostica(truePositives, falsePositives, falseNegatives, trueNegatives).reduccion_porcentaje;
 }
-
-function negativeEntropyReduction (truePositives, falseNegatives, falsePositives, trueNegatives)
-{
-  return calculateEntropyMetrics(truePositives, falsePositives, falseNegatives, trueNegatives).negativeEntropyReduction * 100;
-};
 
 function positiveFScore (truePositives, falseNegatives, falsePositives, trueNegatives) {
   const ppv = positivePredictiveValue(truePositives, falseNegatives, falsePositives, trueNegatives);
@@ -303,7 +296,7 @@ function kappa (truePositives, falseNegatives, falsePositives, trueNegatives)
   return ((2 * (truePositives * trueNegatives - falseNegatives * falsePositives)) / (assumedPositive * actualNegatives + assumedNegative * actualPositives)) / 100
 }
 
-const noConfidenceIntervals = new Set(["positiveEntropyReduction", "negativeEntropyReduction"]);
+const noConfidenceIntervals = new Set(["entropyReduction"]);
 const otherStandardError = new Set(["negativeTestLikelihoodRatio", "positiveTestLikelihoodRatio"]);
 
 const formulasByParameter = new Map();
@@ -316,10 +309,8 @@ formulasByParameter.set("prevalence", prevalence);
 formulasByParameter.set("diagnosticAccuracy", diagnosticAccuracy);
 formulasByParameter.set("positiveTestLikelihoodRatio", PositiveTestLikelihoodRatio);
 formulasByParameter.set("negativeTestLikelihoodRatio", NegativeTestLikelihoodRatio);
-formulasByParameter.set("positiveEntropyReduction", positiveEntropyReduction);
-formulasByParameter.set("negativeEntropyReduction", negativeEntropyReduction);
-formulasByParameter.set("positiveFScore", positiveFScore);
-formulasByParameter.set("negativeFScore", negativeFScore);
+formulasByParameter.set("entropyReduction", entropyReduction);
+formulasByParameter.set("FScore", positiveFScore);
 formulasByParameter.set("kappa", kappa);
 
 function checkInput (inputContent)
@@ -425,10 +416,8 @@ const spanishPairs = [
   ["prevalenceLabel", "Prevalencia"],
   ["positiveTestLikelihoodRatioLabel", "Razón de Verosimilitud Prueba+"],
   ["negativeTestLikelihoodRatioLabel", "Razón de Verosimilitud Prueba-"],
-  ["positiveEntropyReductionLabel", "Reducción de la Entropía Negativa"],
-  ["negativeEntropyReductionLabel", "Reducción de la Entropía Positiva"],
-  ["positiveFScoreLabel", "Puntaje F Positivo"],
-  ["negativeFScoreLabel", "Puntaje F Negativo"],
+  ["entropyReductionLabel", "Reducción de la Entropía"],
+  ["FScoreLabel", "Puntaje F"],
   ["kappaLabel", "Kappa de Cohen"],
   ["diagnosticAccuracyLabel", "Precisión Diagnóstica"]
 ];
@@ -447,10 +436,8 @@ const englishPairs = [
   ["prevalenceLabel", "Prevalence"],
   ["positiveTestLikelihoodRatioLabel", "Positive Test Likelihood Ratio"],
   ["negativeTestLikelihoodRatioLabel", "Negative Test Likelihood Ratio"],
-  ["positiveEntropyReductionLabel", "Positive Entropy Reduction"],
-  ["negativeEntropyReductionLabel", "Negative Entropy Reduction"],
-  ["positiveFScoreLabel", "Positive F-Score"],
-  ["negativeFScoreLabel", "Negative F-Score"],
+  ["entropyReductionLabel", "Entropy Reduction"],
+  ["FScoreLabel", "F-Score"],
   ["kappaLabel", "Cohen's kappa"],
   ["diagnosticAccuracyLabel", "Diagnostic Accuracy"]
 ];
@@ -478,6 +465,12 @@ function switchLanguages ()
       const textElementId = allTextElements[i];
       document.getElementById(textElementId).textContent = toSpanish.get(textElementId);
     }
+
+    document.getElementById("true_positives").placeholder = "VP";
+    document.getElementById("false_positives").placeholder = "FP";
+    document.getElementById("true_negatives").placeholder = "VN";
+    document.getElementById("false_negatives").placeholder = "FN";
+
     // Set the language button content so that language mode flags work and users see the right target language name in the button text
     languageButton.textContent = english;
   }
@@ -489,6 +482,12 @@ function switchLanguages ()
       const textElementId = allTextElements[i];
       document.getElementById(textElementId).textContent = toEnglish.get(textElementId);
     }
+
+    document.getElementById("true_positives").placeholder = "True positives";
+    document.getElementById("false_positives").placeholder = "False positives";
+    document.getElementById("true_negatives").placeholder = "True negatives";
+    document.getElementById("false_negatives").placeholder = "False negatives";
+    
     // Set the language button content so that language mode flags work and users see the right target language name in the button text
     languageButton.textContent = spanish;
   }
